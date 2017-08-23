@@ -35,7 +35,7 @@ public class UberUtilsTest {
 
 	@Test
 	public void linkGetToUberNode() throws Exception {
-		UberNode linkNode = UberUtils.toUberLink("/foo", new SpringActionDescriptor("get", RequestMethod.GET.name()), Link.REL_SELF);
+		UberNode linkNode = UberUtils.toUberLink("/foo", new SpringActionDescriptor("get", RequestMethod.GET.name(), Collections.emptyList()), Link.REL_SELF);
 		assertEquals(Arrays.asList(Link.REL_SELF), linkNode.getRel());
 		assertEquals("/foo", linkNode.getUrl());
 		assertNull(linkNode.getModel());
@@ -45,7 +45,7 @@ public class UberUtilsTest {
 	@Test
 	public void linkPostToUberNode() throws Exception {
 		// TODO create a Link with variables separate from URITemplate for POST
-		UberNode linkNode = UberUtils.toUberLink("/foo{?foo,bar}", new SpringActionDescriptor("post", RequestMethod.POST.name()), Link.REL_SELF);
+		UberNode linkNode = UberUtils.toUberLink("/foo{?foo,bar}", new SpringActionDescriptor("post", RequestMethod.POST.name(), Collections.emptyList()), Link.REL_SELF);
 		assertEquals(Arrays.asList(Link.REL_SELF), linkNode.getRel());
 		assertEquals("/foo", linkNode.getUrl());
 		assertEquals("foo={foo}&bar={bar}", linkNode.getModel());

@@ -1,8 +1,8 @@
 package com.github.hateoas.forms.spring.siren;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 /**
  * All entities that have classes and a title.

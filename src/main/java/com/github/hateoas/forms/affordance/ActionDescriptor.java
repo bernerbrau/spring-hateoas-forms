@@ -1,6 +1,7 @@
 package com.github.hateoas.forms.affordance;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import com.github.hateoas.forms.action.Cardinality;
@@ -108,4 +109,6 @@ public interface ActionDescriptor {
 	 * @param visitor visitor
 	 */
 	void accept(ActionInputParameterVisitor visitor);
+
+    List<String> getClasses();
 }

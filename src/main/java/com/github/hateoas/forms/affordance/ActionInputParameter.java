@@ -189,4 +189,7 @@ public interface ActionInputParameter {
 
 	boolean isReadOnly();
 
+    String getTitle();
+
+	String getRegex();
 }

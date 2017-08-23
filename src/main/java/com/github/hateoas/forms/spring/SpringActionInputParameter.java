@@ -63,6 +63,9 @@ public abstract class SpringActionInputParameter implements ActionInputParameter
 
 	Boolean required;
 
+	String title;
+	String regex;
+
 	protected SpringActionInputParameter(final String name, final Object value, final ConversionService conversionService) {
 		this.name = name;
 		this.conversionService = conversionService;
@@ -272,4 +275,13 @@ public abstract class SpringActionInputParameter implements ActionInputParameter
 		this.type = type;
 	}
 
+	@Override
+	public String getTitle() {
+		return title;
+	}
+
+	@Override
+	public String getRegex() {
+		return regex;
+	}
 }

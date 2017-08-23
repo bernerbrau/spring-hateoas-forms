@@ -1,40 +1,20 @@
 package com.github.hateoas.forms.spring.siren;
 
+import com.github.hateoas.forms.PropertyUtils;
+import com.github.hateoas.forms.action.Type;
+import com.github.hateoas.forms.affordance.*;
+import com.github.hateoas.forms.spring.DefaultDocumentationProvider;
+import com.github.hateoas.forms.spring.DocumentationProvider;
+import org.springframework.hateoas.*;
+import org.springframework.hateoas.core.DefaultRelProvider;
+import org.springframework.util.ObjectUtils;
+
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.RelProvider;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.Resources;
-import org.springframework.hateoas.TemplateVariable;
-import org.springframework.hateoas.UriTemplate;
-import org.springframework.hateoas.core.DefaultRelProvider;
-import org.springframework.util.ObjectUtils;
-
-import com.github.hateoas.forms.PropertyUtils;
-import com.github.hateoas.forms.action.Type;
-import com.github.hateoas.forms.affordance.ActionDescriptor;
-import com.github.hateoas.forms.affordance.ActionInputParameter;
-import com.github.hateoas.forms.affordance.ActionInputParameterVisitor;
-import com.github.hateoas.forms.affordance.Affordance;
-import com.github.hateoas.forms.affordance.DataType;
-import com.github.hateoas.forms.affordance.Suggest;
-import com.github.hateoas.forms.spring.DefaultDocumentationProvider;
-import com.github.hateoas.forms.spring.DocumentationProvider;
+import java.util.*;
 
 /**
  * Maps spring-hateoas response data to siren data. Created by Dietrich on 17.04.2016.
@@ -203,7 +183,7 @@ public class SirenUtils {
 	}
 
 	private void traverseAttribute(SirenEntityContainer objectNode, Map<String, Object> propertiesNode, String name,
-			String docUrl, Object content) throws InvocationTargetException, IllegalAccessException {
+                                   String docUrl, Object content) throws InvocationTargetException, IllegalAccessException {
 		Object value = getContentAsScalarValue(content);
 
 		if (value != NULL_VALUE) {
@@ -295,7 +275,7 @@ public class SirenUtils {
 							href = affordance.getHref();
 						}
 
-						SirenAction sirenAction = new SirenAction(null, actionDescriptor.getActionName(), null,
+						SirenAction sirenAction = new SirenAction(actionDescriptor.getClasses(), actionDescriptor.getActionName(), affordance.getTitle(),
 								actionDescriptor.getHttpMethod(), href, requestMediaType, fields);
 						ret.add(sirenAction);
 					}
@@ -309,7 +289,7 @@ public class SirenUtils {
 					if (!queryOnly) {
 						break;
 					}
-					fields.add(new SirenField(variable.getName(), "text", (String) null, variable.getDescription(), null));
+					fields.add(new SirenTextField(variable.getName(), "text", null, variable.getDescription(), false, true, null, null));
 				}
 				// no support for non-query fields in siren
 				if (queryOnly) {
@@ -364,14 +344,14 @@ public class SirenUtils {
 	}
 
 	private SirenField createSirenField(String paramName, Object propertyValue, ActionInputParameter inputParameter,
-			List<Suggest<Object>> possibleValues) {
+                                        List<Suggest<Object>> possibleValues) {
 		SirenField sirenField;
 		if (possibleValues.isEmpty()) {
 			String propertyValueAsString = propertyValue == null ? null : propertyValue.toString();
 			Type htmlInputFieldType = inputParameter.getHtmlInputFieldType();
 			// TODO: null -> array or bean parameter without possible values
 			String type = htmlInputFieldType == null ? "text" : htmlInputFieldType.name().toLowerCase();
-			sirenField = new SirenField(paramName, type, propertyValueAsString, null, null);
+			sirenField = new SirenTextField(paramName, type, propertyValueAsString, inputParameter.getTitle(), inputParameter.isReadOnly(), inputParameter.isRequired(), inputParameter.getRegex(), null);
 		} else {
 			List<SirenFieldValue> sirenPossibleValues = new ArrayList<SirenFieldValue>();
 			String type;
@@ -391,7 +371,7 @@ public class SirenUtils {
 							.add(new SirenFieldValue(possibleValue.getText(), possibleValue.getUnwrappedValue(), selected));
 				}
 			}
-			sirenField = new SirenField(paramName, type, sirenPossibleValues, null, null);
+			sirenField = new SirenMultiField(paramName, type, sirenPossibleValues, inputParameter.getTitle(), inputParameter.isReadOnly(), inputParameter.isRequired(), null);
 		}
 		return sirenField;
 	}

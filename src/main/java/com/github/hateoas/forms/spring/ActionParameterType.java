@@ -71,4 +71,7 @@ public interface ActionParameterType {
 
 	Type getHtmlInputFieldType();
 
+    String getTitle();
+
+    String getRegex();
 }

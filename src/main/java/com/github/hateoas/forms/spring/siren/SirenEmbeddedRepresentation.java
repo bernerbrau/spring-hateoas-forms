@@ -43,8 +43,8 @@ public class SirenEmbeddedRepresentation extends SirenSubEntity implements Siren
 	 * @param title Descriptive text about the entity. Optional.
 	 */
 	public SirenEmbeddedRepresentation(List<String> sirenClasses, Map<String, Object> properties,
-									   List<SirenSubEntity> entities,
-									   List<SirenAction> actions, List<SirenLink> links, List<String> rels, String
+                                       List<SirenSubEntity> entities,
+                                       List<SirenAction> actions, List<SirenLink> links, List<String> rels, String
 											   title) {
 
 		super(rels, title, sirenClasses);

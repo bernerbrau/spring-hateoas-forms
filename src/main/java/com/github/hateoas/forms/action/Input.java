@@ -61,4 +61,6 @@ public @interface Input {
 	 */
 	boolean editable() default true;
 
+    String title() default "";
+
 }

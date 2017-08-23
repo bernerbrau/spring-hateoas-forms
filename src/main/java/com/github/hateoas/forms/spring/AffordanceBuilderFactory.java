@@ -101,7 +101,7 @@ public class AffordanceBuilderFactory implements MethodLinkBuilderFactory<Afford
 		String mapping = StringUtils.isEmpty(query) ? pathMapping : pathMapping + "{?" + query + "}";
 		PartialUriTemplate partialUriTemplate = new PartialUriTemplate(AffordanceBuilder.getBuilder().build().toString() + mapping);
 
-		SpringActionDescriptor actionDescriptor = new SpringActionDescriptor(method.name().toLowerCase(), method.name());
+		SpringActionDescriptor actionDescriptor = new SpringActionDescriptor(method.name().toLowerCase(), method.name(), Collections.emptyList());
 
 		if (parameter != null) {
 			actionDescriptor.setRequestBody(parameter);

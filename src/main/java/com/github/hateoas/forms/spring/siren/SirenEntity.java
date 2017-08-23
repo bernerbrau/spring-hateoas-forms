@@ -41,7 +41,7 @@ public class SirenEntity extends AbstractSirenEntity implements SirenEntityConta
 	 * @param title Descriptive text about the entity. Optional.
 	 */
 	public SirenEntity(List<String> sirenClasses, Map<String, Object> properties, List<SirenSubEntity> entities,
-					   List<SirenAction> actions, List<SirenLink> links, String title) {
+                       List<SirenAction> actions, List<SirenLink> links, String title) {
 		super(title, sirenClasses);
 		this.properties = properties;
 		this.entities = entities;

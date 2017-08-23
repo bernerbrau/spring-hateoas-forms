@@ -1,16 +1,11 @@
 package com.github.hateoas.forms.spring.siren;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Collection;
-
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.hateoas.forms.spring.DocumentationProvider;
-
 import org.springframework.hateoas.RelProvider;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -18,6 +13,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Collection;
 
 /**
  * Http message converter which converts Spring Hateoas resource beans to siren messages.

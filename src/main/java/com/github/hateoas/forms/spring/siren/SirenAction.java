@@ -1,9 +1,9 @@
 package com.github.hateoas.forms.spring.siren;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.util.List;
 
 /**
  * Created by Dietrich on 17.04.2016.

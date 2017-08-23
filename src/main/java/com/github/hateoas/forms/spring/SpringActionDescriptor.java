@@ -27,15 +27,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.github.hateoas.forms.action.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.PropertyAccessorUtils;
 import org.springframework.core.MethodParameter;
@@ -51,12 +46,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.hateoas.forms.PropertyUtils;
-import com.github.hateoas.forms.action.Action;
-import com.github.hateoas.forms.action.Cardinality;
-import com.github.hateoas.forms.action.DTOParam;
-import com.github.hateoas.forms.action.Input;
-import com.github.hateoas.forms.action.ResourceHandler;
-import com.github.hateoas.forms.action.Select;
 import com.github.hateoas.forms.affordance.ActionDescriptor;
 import com.github.hateoas.forms.affordance.ActionInputParameter;
 import com.github.hateoas.forms.affordance.ActionInputParameterVisitor;
@@ -87,19 +76,21 @@ public class SpringActionDescriptor implements ActionDescriptor {
 
 	private String semanticActionType;
 
-	private final Map<String, ActionInputParameter> requestParams = new LinkedHashMap<String, ActionInputParameter>();
+	private final Map<String, ActionInputParameter> requestParams = new LinkedHashMap<>();
 
-	private final Map<String, ActionInputParameter> pathVariables = new LinkedHashMap<String, ActionInputParameter>();
+	private final Map<String, ActionInputParameter> pathVariables = new LinkedHashMap<>();
 
-	private final Map<String, ActionInputParameter> requestHeaders = new LinkedHashMap<String, ActionInputParameter>();
+	private final Map<String, ActionInputParameter> requestHeaders = new LinkedHashMap<>();
 
 	private ActionInputParameter requestBody;
 
-	private final Map<String, ActionInputParameter> bodyInputParameters = new LinkedHashMap<String, ActionInputParameter>();
+	private final Map<String, ActionInputParameter> bodyInputParameters = new LinkedHashMap<>();
 
-	private static final Map<Class<?>, List<ActionParameterType>> parameterInfo = new HashMap<Class<?>, List<ActionParameterType>>();
+	private static final Map<Class<?>, List<ActionParameterType>> parameterInfo = new HashMap<>();
 
 	private Cardinality cardinality = Cardinality.SINGLE;
+
+	private List<String> classes = new ArrayList<>();
 
 	private static boolean SPRING_4_2 = false;
 
@@ -120,17 +111,18 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	 * identify the action using a form name.
 	 * @param httpMethod used during submit
 	 */
-	public SpringActionDescriptor(final String actionName, final String httpMethod) {
-		this(actionName, httpMethod, null, null);
+	public SpringActionDescriptor(final String actionName, final String httpMethod, final List<String> classes) {
+		this(actionName, httpMethod, classes, null, null);
 	}
 
-	public SpringActionDescriptor(final String actionName, final String httpMethod, final String consumes, final String produces) {
+	public SpringActionDescriptor(final String actionName, final String httpMethod, final List<String> classes, final String consumes, final String produces) {
 		Assert.notNull(actionName);
 		Assert.notNull(httpMethod);
 		this.httpMethod = httpMethod;
 		this.actionName = actionName;
 		this.consumes = consumes;
 		this.produces = produces;
+		this.classes = classes;
 	}
 
 	public SpringActionDescriptor(final Method method) {
@@ -140,6 +132,10 @@ public class SpringActionDescriptor implements ActionDescriptor {
 		consumes = getConsumes(method);
 		produces = getProduces(method);
 		cardinality = getCardinality(method, requestMethod, method.getReturnType());
+		classes = Optional.ofNullable(method.getAnnotation(Classes.class))
+                .map(Classes::value)
+                .map(Arrays::asList)
+                .orElseGet(Collections::emptyList);
 	}
 
 	/**
@@ -442,11 +438,32 @@ public class SpringActionDescriptor implements ActionDescriptor {
 		return parametersInfo;
 	}
 
+
+	private static int compareFormOrder(PropertyDescriptor propertyDescriptor1, PropertyDescriptor propertyDescriptor2) {
+		return Integer.compare(getFormOrder(propertyDescriptor1), getFormOrder(propertyDescriptor2));
+	}
+
+	private static int getFormOrder(PropertyDescriptor propertyDescriptor) {
+		FormOrder formOrder = Optional.ofNullable(propertyDescriptor.getReadMethod()).map(m -> m.getAnnotation(FormOrder.class)).orElse(null);
+		if (formOrder == null) {
+			formOrder = Optional.ofNullable(propertyDescriptor.getWriteMethod()).map(m -> m.getAnnotation(FormOrder.class)).orElse(null);
+		}
+		if (formOrder == null) {
+			return Integer.MAX_VALUE;
+		}
+		return formOrder.value();
+	}
+
 	static List<ActionParameterType> findBeanInfo(final Class<?> beanType, final List<ActionParameterType> previous)
 			throws IntrospectionException, NoSuchFieldException {
 		// TODO support Option provider by other method args?
 		final BeanInfo beanInfo = Introspector.getBeanInfo(beanType);
-		final PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+		final PropertyDescriptor[] propertyDescriptors =
+				Arrays.stream(beanInfo.getPropertyDescriptors())
+					.sorted(SpringActionDescriptor::compareFormOrder)
+					.collect(Collectors.toList())
+					.toArray(new PropertyDescriptor[0]);
+
 
 		// add input field for every setter
 		for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
@@ -775,4 +792,8 @@ public class SpringActionDescriptor implements ActionDescriptor {
 		return "SpringActionDescriptor [httpMethod=" + httpMethod + ", actionName=" + actionName + "]";
 	}
 
+	@Override
+	public List<String> getClasses() {
+		return classes;
+	}
 }

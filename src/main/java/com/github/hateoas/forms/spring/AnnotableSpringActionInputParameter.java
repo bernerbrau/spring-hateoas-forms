@@ -42,6 +42,16 @@ public class AnnotableSpringActionInputParameter extends SpringActionInputParame
 		return readOnly != null ? readOnly : parameter.isReadOnly();
 	}
 
+	@Override
+	public String getTitle() {
+		return title != null ? title : parameter.getTitle();
+	}
+
+	@Override
+	public String getRegex() {
+		return regex != null ? regex : parameter.getRegex();
+	}
+
 	/**
 	 * Gets parameter name of this action input parameter.
 	 *

@@ -76,6 +76,7 @@ public abstract class ActionParameterTypeImpl implements ActionParameterType {
 	private boolean required;
 
 	private static final String[] EMPTY = new String[0];
+	private String title;
 
 	public ActionParameterTypeImpl(final String paramName) {
 		this.paramName = paramName;
@@ -132,6 +133,8 @@ public abstract class ActionParameterTypeImpl implements ActionParameterType {
 			 * Check if annotations indicate that is required
 			 */
 			setRequired(inputAnnotation.required() || requiredByAnnotations);
+
+			setTitle(inputAnnotation.title());
 
 			type = ParameterType.INPUT;
 		}
@@ -305,6 +308,20 @@ public abstract class ActionParameterTypeImpl implements ActionParameterType {
 
 	private void setRequired(final boolean required) {
 		this.required = required;
+	}
+
+	private void setTitle(final String title) {
+		this.title = title;
+	}
+
+	@Override
+	public String getTitle() {
+		return title;
+	}
+
+	@Override
+	public String getRegex() {
+		return (String)inputConstraints.get(ActionInputParameter.PATTERN);
 	}
 
 	public class OptionsPossibleValuesResolver<T> implements PossibleValuesResolver<T> {

@@ -216,7 +216,7 @@ public class UberUtils {
 		if (link instanceof Affordance) {
 			actionDescriptors = ((Affordance) link).getActionDescriptors();
 		} else {
-			actionDescriptors = Arrays.asList((ActionDescriptor) new SpringActionDescriptor("get", RequestMethod.GET.name()));
+			actionDescriptors = Collections.singletonList(new SpringActionDescriptor("get", RequestMethod.GET.name(), Collections.emptyList()));
 		}
 		return actionDescriptors;
 	}

@@ -31,6 +31,10 @@ public enum Type {
 	 */
 	TEXT("text"),
 	/**
+	 * input type textarea
+	 */
+	TEXTAREA("textarea"),
+	/**
 	 * input type hidden
 	 */
 	HIDDEN("hidden"),
